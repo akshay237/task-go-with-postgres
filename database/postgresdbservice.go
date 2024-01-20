@@ -15,7 +15,8 @@ type PostgresDBService struct {
 
 func (o *PostgresDBService) createNewDBInstance() (*sql.DB, error) {
 	// 1. Convert PostgreSQL Config to DB Config.
-	dbinst, err := sql.Open("postgres", o.config.FormatDSN())
+	constr := "user=akshay dbname=akshay password=password sslmode=disable"
+	dbinst, err := sql.Open("postgres", constr)
 	if err != nil {
 		return nil, err
 	}
