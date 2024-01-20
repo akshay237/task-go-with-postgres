@@ -7,7 +7,7 @@ import (
 )
 
 func (o *TaskHdlr) addTask(w http.ResponseWriter, r *http.Request) {
-	var req *tasksvc.CreateTaskReq
+	var req tasksvc.CreateTaskReq
 	errData, err := apiserver.JsonBodyParser(r.Body, &req)
 	if err != nil {
 		o.logger.Println("ERR : ", err)
@@ -15,7 +15,7 @@ func (o *TaskHdlr) addTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiresp, apierr := o.tasksvc.AddTask(req)
+	apiresp, apierr := o.tasksvc.AddTask(&req)
 	if apierr != nil {
 		o.logger.Println("ERR : ", apierr)
 		apiserver.APIResponseInternalServerError(w, r, "MALFORMED_REQUEST", nil, apierr.Error())
@@ -26,7 +26,7 @@ func (o *TaskHdlr) addTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o *TaskHdlr) getTask(w http.ResponseWriter, r *http.Request) {
-	var req *tasksvc.GetTaskReq
+	var req tasksvc.GetTaskReq
 	errData, err := apiserver.JsonBodyParser(r.Body, &req)
 	if err != nil {
 		o.logger.Println("ERR : ", err)
@@ -34,7 +34,7 @@ func (o *TaskHdlr) getTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiresp, apierr := o.tasksvc.GetTask(req)
+	apiresp, apierr := o.tasksvc.GetTask(&req)
 	if apierr != nil {
 		o.logger.Println("ERR : ", apierr)
 		apiserver.APIResponseInternalServerError(w, r, "MALFORMED_REQUEST", nil, apierr.Error())
@@ -44,7 +44,7 @@ func (o *TaskHdlr) getTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o *TaskHdlr) updateTask(w http.ResponseWriter, r *http.Request) {
-	var req *tasksvc.UpdateTaskRequest
+	var req tasksvc.UpdateTaskRequest
 	errData, err := apiserver.JsonBodyParser(r.Body, &req)
 	if err != nil {
 		o.logger.Println("ERR : ", err)
@@ -52,7 +52,7 @@ func (o *TaskHdlr) updateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiresp, apierr := o.tasksvc.UpdateTask(req)
+	apiresp, apierr := o.tasksvc.UpdateTask(&req)
 	if apierr != nil {
 		o.logger.Println("ERR : ", apierr)
 		apiserver.APIResponseInternalServerError(w, r, "MALFORMED_REQUEST", nil, apierr.Error())
@@ -62,7 +62,7 @@ func (o *TaskHdlr) updateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o *TaskHdlr) deleteTask(w http.ResponseWriter, r *http.Request) {
-	var req *tasksvc.DeleteTaskReq
+	var req tasksvc.DeleteTaskReq
 	errData, err := apiserver.JsonBodyParser(r.Body, &req)
 	if err != nil {
 		o.logger.Println("ERR : ", err)
@@ -70,7 +70,7 @@ func (o *TaskHdlr) deleteTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	apiresp, apierr := o.tasksvc.DeleteTask(req)
+	apiresp, apierr := o.tasksvc.DeleteTask(&req)
 	if apierr != nil {
 		o.logger.Println("ERR : ", apierr)
 		apiserver.APIResponseInternalServerError(w, r, "MALFORMED_REQUEST", nil, apierr.Error())
@@ -87,5 +87,5 @@ func (o *TaskHdlr) getAllTasks(w http.ResponseWriter, r *http.Request) {
 		apiserver.APIResponseInternalServerError(w, r, "MALFORMED_REQUEST", nil, apierr.Error())
 		return
 	}
-	apiserver.APIResponseOK(w, r, apiresp, "added task successfully")
+	apiserver.APIResponseOK(w, r, apiresp, "fetched all task successfully")
 }

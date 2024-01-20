@@ -1,0 +1,13 @@
+{
+    "scratchdir":"/home/harry/Documents/task-go-with-postgres",
+    "postgres" : {
+        "host":"127.0.0.1",
+        "port":5432,
+        "user":"akshay",
+        "password":"password",
+        "database":"akshay"
+    },
+    "apiserver": {
+        "port":5000
+    }
+}

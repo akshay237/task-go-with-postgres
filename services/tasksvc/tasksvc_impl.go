@@ -7,23 +7,14 @@ func (o *TaskSvcImpl) AddTask(req *CreateTaskReq) (*TaskResp, error) {
 		return nil, err
 	}
 
-	query := `insert into tasks(task_title, task_description, task_priority, task_due_datetime, contact_name) values (?, ?, ?, ?, ?);`
-	res, err := conn.Exec(query, req.TaskTitle, req.TaskDescription, req.TaskPriority, req.TaskDueDatetime, req.ContactName)
-	if err != nil {
+	var taskId int
+	query := `insert into tasks (task_title, task_description, task_priority, task_due_datetime, contact_name) values ($1, $2, $3, $4, $5) returning task_id;`
+	scanerr := conn.QueryRow(query, req.TaskTitle, req.TaskDescription, req.TaskPriority, req.TaskDueDatetime, req.ContactName).Scan(&taskId)
+	if scanerr != nil {
 		o.logger.Println("Error in eexcuting insert query is", err)
 		return nil, err
 	}
-	nrows, err := res.RowsAffected()
-	if nrows == 0 || err != nil {
-		o.logger.Println("Error in insert is", err, "and rows affected are", nrows)
-		return nil, err
-	}
-	taskid, err := res.LastInsertId()
-	if err != nil {
-		o.logger.Println("Error in getting lastid", err)
-		return nil, err
-	}
-	return o.GetTask(&GetTaskReq{TaskId: int(taskid)})
+	return o.GetTask(&GetTaskReq{TaskId: taskId})
 }
 
 func (o *TaskSvcImpl) GetTask(req *GetTaskReq) (*TaskResp, error) {
@@ -34,7 +25,7 @@ func (o *TaskSvcImpl) GetTask(req *GetTaskReq) (*TaskResp, error) {
 	}
 
 	resp := &TaskResp{}
-	query := `select task_id, task_title, task_description, task_priority, task_due_datetime, contact_name, is_deleted from tasks where task_id = ? and is_deleted != 1;`
+	query := `select task_id, task_title, task_description, task_priority, task_due_datetime, contact_name, is_deleted from tasks where task_id = $1 and is_deleted is not true;`
 	err = conn.QueryRow(query, req.TaskId).Scan(&resp.TaskId, &resp.TaskTitle, &resp.TaskDescription, &resp.TaskPriority, &resp.TaskDueDatetime, &resp.ContactName, &resp.IsDeleted)
 	if err != nil {
 		o.logger.Println("Scan error", err)
@@ -76,7 +67,7 @@ func (o *TaskSvcImpl) UpdateTask(req *UpdateTaskRequest) (*TaskResp, error) {
 		req.ContactName = &taskInfo.ContactName
 	}
 
-	query := `update tasks set task_title=? and task_description= ? and task_priority=? and task_due_datetime=? and contact_name = ? where task_id = ?;`
+	query := `update tasks set task_title=$1, task_description= $2, task_priority=$3, task_due_datetime=$4, contact_name = $5 where task_id = $6;`
 	res, err := conn.Exec(query, req.TaskTitle, req.TaskDescription, req.TaskPriority, req.TaskDueDatetime, req.ContactName, req.TaskId)
 	if err != nil {
 		o.logger.Println("Error in updating task", err)
@@ -99,7 +90,7 @@ func (o *TaskSvcImpl) DeleteTask(req *DeleteTaskReq) (*DeleteTaskResp, error) {
 		return nil, err
 	}
 
-	query := `update tasks set is_deleted = 1 where task_id = ?;`
+	query := `update tasks set is_deleted = true where task_id = $1;`
 	res, err := conn.Exec(query, req.TaskId)
 	if err != nil {
 		o.logger.Println("Error in updating task", err)
@@ -123,7 +114,7 @@ func (o *TaskSvcImpl) GetAllTasks() ([]*TaskResp, error) {
 	}
 
 	rsp := []*TaskResp{}
-	query := `select task_id, task_title, task_description, task_priority, task_due_datetime, contact_name, is_deleted from tasks where  is_deleted != 1;`
+	query := `select task_id, task_title, task_description, task_priority, task_due_datetime, contact_name, is_deleted from tasks where  is_deleted is not true;`
 	rows, err := conn.Query(query)
 	if err != nil {
 		o.logger.Println("Error in getting task info", err)

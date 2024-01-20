@@ -20,16 +20,16 @@ type UpdateTaskRequest struct {
 }
 
 type GetTaskReq struct {
-	TaskId int `json:"taskid" validate:"required"`
+	TaskId int `json:"task_id" validate:"required"`
 }
 
 type DeleteTaskReq struct {
-	TaskId int `json:"taskid" validate:"required"`
+	TaskId int `json:"task_id" validate:"required"`
 }
 
 // Response Struct
 type DeleteTaskResp struct {
-	TaskId    int  `json:"taskid"`
+	TaskId    int  `json:"task_id"`
 	IsDeleted bool `json:"isdeleted"`
 }
 

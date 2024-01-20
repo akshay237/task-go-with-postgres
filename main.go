@@ -121,7 +121,7 @@ func main() {
 		},
 	}
 
-	listenaddr := fmt.Sprintf(":%d", serverConfig.APIServerConfig.Port)
+	listenaddr := fmt.Sprintf(":%d", *serverConfig.APIServerConfig.Port)
 	handlerMap := apiserver.NewApiServerHandlerMap(apilogger)
 	handlerMap.AddHandler("/api/v1/task", taskHdlrI)
 

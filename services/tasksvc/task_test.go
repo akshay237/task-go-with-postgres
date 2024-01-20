@@ -12,6 +12,7 @@ import (
 func getPostgresConfig(t *testing.T) *database.ConfigPostgres {
 	config := &database.ConfigPostgres{
 		Host:     "127.0.0.1",
+		Port:     5432,
 		User:     "akshay",
 		Password: "password",
 		Database: "akshay",
@@ -47,17 +48,18 @@ func getTaskTest(t *testing.T, taskSvcI TaskSvc, taskid int) {
 	t.Log("Get Task Resp", string(taskRspBytes))
 }
 
-func updateTaskTest(t *testing.T, taskSvcI TaskSvc, priority string, timestamep time.Time) {
-	req := &CreateTaskReq{
-		TaskPriority:    priority,
-		TaskDueDatetime: timestamep,
+func updateTaskTest(t *testing.T, taskSvcI TaskSvc, priority string, timestamep time.Time, taskid int) {
+	req := &UpdateTaskRequest{
+		TaskId:          taskid,
+		TaskPriority:    &priority,
+		TaskDueDatetime: &timestamep,
 	}
-	taskRsp, err := taskSvcI.AddTask(req)
+	taskRsp, err := taskSvcI.UpdateTask(req)
 	if err != nil {
 		t.Log("Error is", err)
 	}
 	taskRspBytes, _ := json.Marshal(taskRsp)
-	t.Log("Add Task Resp", string(taskRspBytes))
+	t.Log("Update Task Resp", string(taskRspBytes))
 }
 
 func getAllTaskTest(t *testing.T, taskSvcI TaskSvc) {
@@ -96,8 +98,8 @@ func TestTaskSvc(t *testing.T) {
 	createTaskTest(t, taskSvcI, "Set Alarm", "Discuss Project Details", "MEDIUM", "Akshay", timestamp)
 	getTaskTest(t, taskSvcI, 2)
 	timestamp = time.Now().AddDate(0, 0, 2)
-	updateTaskTest(t, taskSvcI, "HIGH", timestamp)
+	updateTaskTest(t, taskSvcI, "HIGH", timestamp, 2)
 	getAllTaskTest(t, taskSvcI)
-	//deleteTaskTest(t, taskSvcI, 1)
+	deleteTaskTest(t, taskSvcI, 5)
 
 }
