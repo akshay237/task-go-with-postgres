@@ -1,6 +1,6 @@
 CREATE TABLE tasks (
-    task_id SERIAL PRIMARY KEY,
     task_title VARCHAR(255) NOT NULL,
+    task_id SERIAL PRIMARY KEY,
     task_description TEXT,
     task_priority VARCHAR(50),
     task_due_datetime TIMESTAMP NOT NULL,

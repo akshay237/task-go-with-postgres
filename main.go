@@ -15,6 +15,8 @@ import (
 	"task-go-with-postgres/apiserver"
 	"task-go-with-postgres/config"
 	"task-go-with-postgres/database"
+	"task-go-with-postgres/handlers/taskhdlr"
+	"task-go-with-postgres/services/tasksvc"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -102,8 +104,10 @@ func main() {
 	addLoggerFile(logDirPath, "handler.log", hdlrlogger)
 
 	// 1. Service
+	taskSvcI := tasksvc.NewTaskSvc(postgresDBI, servlogger)
 
 	// 2. Handlers
+	taskHdlrI := taskhdlr.NewTaskHdlr(taskSvcI, hdlrlogger)
 
 	activeThreads := &sync.WaitGroup{}
 
@@ -119,7 +123,7 @@ func main() {
 
 	listenaddr := fmt.Sprintf(":%d", serverConfig.APIServerConfig.Port)
 	handlerMap := apiserver.NewApiServerHandlerMap(apilogger)
-	handlerMap.AddHandler("/api/v1/task", nil)
+	handlerMap.AddHandler("/api/v1/task", taskHdlrI)
 
 	apiserver := apiserver.NewApiServer(listenaddr, handlerMap.ToRouter(), apilogger, apiservercallback)
 
